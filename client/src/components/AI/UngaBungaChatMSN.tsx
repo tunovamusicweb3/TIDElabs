@@ -6,6 +6,7 @@ import { audioManager } from '@/lib/audio/audioManager';
 import { replaceEmoticons, MSN_EMOTICONS } from '@/lib/emoticons/msn-emoticons';
 import { TypingIndicator } from './TypingIndicator';
 import { NotificationToast } from './NotificationToast';
+import { BuzzEffect } from './BuzzEffect';
 
 const ChatContainer = styled.div`
   display: flex;
@@ -282,7 +283,8 @@ export function UngaBungaChatMSN() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showEmoticons, setShowEmoticons] = useState(false);
-  const [notifications, setNotifications] = useState<Array<{ id: string }>>([]);
+  const [notifications, setNotifications] = useState<Array<{ id: string }>>([])
+  const [showBuzz, setShowBuzz] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -330,11 +332,13 @@ export function UngaBungaChatMSN() {
   };
 
   const handleZumbido = () => {
-    audioManager.playClick();
+    setShowBuzz(true);
+    audioManager.playBuzz();
     // Create vibration effect
     if (navigator.vibrate) {
       navigator.vibrate([100, 50, 100, 50, 100]);
     }
+    setTimeout(() => setShowBuzz(false), 500);
   };
 
   const handleEmoticonClick = (emoji: string) => {
@@ -426,6 +430,7 @@ export function UngaBungaChatMSN() {
           onClose={() => setNotifications((prev) => prev.filter((n) => n.id !== notif.id))}
         />
       ))}
+      {showBuzz && <BuzzEffect intensity={3} duration={500} />}
     </ChatContainer>
   );
 }

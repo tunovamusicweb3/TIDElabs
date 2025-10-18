@@ -1,7 +1,6 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { audioManager } from '@/lib/audio/audioManager';
 
 const GameContainer = styled.div`
   display: flex;
@@ -19,6 +18,7 @@ const Canvas = styled.canvas`
   background: linear-gradient(180deg, #87ceeb 0%, #e0f6ff 100%);
   display: block;
   cursor: pointer;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 0 rgba(0, 0, 0, 0.5);
 `;
 
 const ScoreBoard = styled.div`
@@ -48,13 +48,16 @@ const Instructions = styled.div`
 export function FlappyShark() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
+  const [highScore, setHighScore] = useState(
+    typeof window !== 'undefined' ? parseInt(localStorage.getItem('flappySharkHighScore') || '0') : 0
+  );
+
   const gameStateRef = useRef({
-    birdY: 150,
-    birdVelocity: 0,
-    pipes: [] as Array<{ x: number; gapY: number }>,
+    bird: { x: 50, y: 150, width: 20, height: 20, velocity: 0 },
+    pipes: [] as Array<{ x: number; gapY: number; width: number; gapSize: number; passed: boolean }>,
     score: 0,
-    gameRunning: true,
+    gameOver: false,
+    gameStarted: false,
   });
 
   useEffect(() => {
@@ -64,166 +67,201 @@ export function FlappyShark() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const gameState = gameStateRef.current;
     const GRAVITY = 0.5;
-    const JUMP_STRENGTH = -12;
     const PIPE_WIDTH = 60;
-    const PIPE_GAP = 120;
-    const PIPE_SPACING = 200;
-    const BIRD_SIZE = 20;
+    const PIPE_GAP = 100;
 
-    let lastPipeX = 300;
+    // Inicializar pipes
+    gameState.pipes = [
+      { x: 300, gapY: 100, width: PIPE_WIDTH, gapSize: PIPE_GAP, passed: false },
+      { x: 500, gapY: 150, width: PIPE_WIDTH, gapSize: PIPE_GAP, passed: false },
+      { x: 700, gapY: 80, width: PIPE_WIDTH, gapSize: PIPE_GAP, passed: false },
+    ];
 
-    const drawBird = (x: number, y: number) => {
-      ctx.fillStyle = '#FFD700';
-      ctx.beginPath();
-      ctx.arc(x, y, BIRD_SIZE, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#FFA500';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Eyes
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.arc(x + 6, y - 5, 3, 0, Math.PI * 2);
-      ctx.fill();
-    };
-
-    const drawPipe = (x: number, gapY: number) => {
-      const topHeight = gapY;
-      const bottomY = gapY + PIPE_GAP;
-
-      // Top pipe
-      ctx.fillStyle = '#228B22';
-      ctx.fillRect(x, 0, PIPE_WIDTH, topHeight);
-      ctx.strokeStyle = '#1a6b1a';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(x, 0, PIPE_WIDTH, topHeight);
-
-      // Bottom pipe
-      ctx.fillRect(x, bottomY, PIPE_WIDTH, canvas.height - bottomY);
-      ctx.strokeRect(x, bottomY, PIPE_WIDTH, canvas.height - bottomY);
-    };
-
-    const checkCollision = (birdX: number, birdY: number): boolean => {
-      // Boundary collision
-      if (birdY - BIRD_SIZE < 0 || birdY + BIRD_SIZE > canvas.height) {
-        return true;
+    const handleClick = () => {
+      if (!gameState.gameStarted) {
+        gameState.gameStarted = true;
+        gameState.score = 0;
+        gameState.gameOver = false;
+        gameState.bird.y = 150;
+        gameState.bird.velocity = 0;
+        audioManager.playClick();
+      } else if (gameState.gameOver) {
+        gameState.gameStarted = true;
+        gameState.gameOver = false;
+        gameState.score = 0;
+        gameState.bird.y = 150;
+        gameState.bird.velocity = 0;
+        gameState.pipes = [
+          { x: 300, gapY: 100, width: PIPE_WIDTH, gapSize: PIPE_GAP, passed: false },
+          { x: 500, gapY: 150, width: PIPE_WIDTH, gapSize: PIPE_GAP, passed: false },
+          { x: 700, gapY: 80, width: PIPE_WIDTH, gapSize: PIPE_GAP, passed: false },
+        ];
+        setScore(0);
+        audioManager.playClick();
+      } else {
+        gameState.bird.velocity = -8;
+        audioManager.playClick();
       }
-
-      // Pipe collision
-      for (let pipe of gameStateRef.current.pipes) {
-        if (
-          birdX + BIRD_SIZE > pipe.x &&
-          birdX - BIRD_SIZE < pipe.x + PIPE_WIDTH
-        ) {
-          if (
-            birdY - BIRD_SIZE < pipe.gapY ||
-            birdY + BIRD_SIZE > pipe.gapY + PIPE_GAP
-          ) {
-            return true;
-          }
-        }
-      }
-
-      return false;
     };
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        handleClick();
+      }
+    };
+
+    canvas.addEventListener('click', handleClick);
+    window.addEventListener('keydown', handleKeyPress);
 
     const gameLoop = () => {
-      const state = gameStateRef.current;
-
-      if (!state.gameRunning) return;
-
-      // Update bird
-      state.birdVelocity += GRAVITY;
-      state.birdY += state.birdVelocity;
-
-      // Generate pipes
-      if (lastPipeX < canvas.width - PIPE_SPACING) {
-        const gapY = Math.random() * (canvas.height - PIPE_GAP - 100) + 50;
-        state.pipes.push({ x: lastPipeX + PIPE_SPACING, gapY });
-        lastPipeX += PIPE_SPACING;
-      }
-
-      // Update pipes
-      state.pipes = state.pipes.filter((pipe) => {
-        pipe.x -= 5;
-        if (pipe.x + PIPE_WIDTH < 0) {
-          state.score++;
-          setScore(state.score);
-          return false;
-        }
-        return true;
-      });
-
-      // Check collision
-      if (checkCollision(100, state.birdY)) {
-        state.gameRunning = false;
-        setGameOver(true);
-        return;
-      }
-
-      // Draw
-      ctx.fillStyle = '#87ceeb';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw gradient sky
+      // Limpiar canvas con gradiente
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
       gradient.addColorStop(0, '#87ceeb');
       gradient.addColorStop(1, '#e0f6ff');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw pipes
-      state.pipes.forEach((pipe) => drawPipe(pipe.x, pipe.gapY));
+      if (gameState.gameStarted && !gameState.gameOver) {
+        // Aplicar gravedad
+        gameState.bird.velocity += GRAVITY;
+        gameState.bird.y += gameState.bird.velocity;
 
-      // Draw bird
-      drawBird(100, state.birdY);
+        // Mover pipes
+        gameState.pipes.forEach((pipe) => {
+          pipe.x -= 4;
 
-      // Draw score
-      ctx.fillStyle = '#000080';
-      ctx.font = 'bold 20px Arial';
-      ctx.fillText(`Score: ${state.score}`, 10, 30);
+          // Detectar si pasó el pipe
+          if (!pipe.passed && pipe.x + pipe.width < gameState.bird.x) {
+            pipe.passed = true;
+            gameState.score++;
+            setScore(gameState.score);
+            audioManager.playSuccess();
+          }
+
+          // Regenerar pipes que salieron de pantalla
+          if (pipe.x + pipe.width < 0) {
+            pipe.x = canvas.width;
+            pipe.gapY = Math.random() * (canvas.height - PIPE_GAP - 40) + 20;
+            pipe.passed = false;
+          }
+        });
+
+        // Detectar colisiones
+        gameState.pipes.forEach((pipe) => {
+          const birdLeft = gameState.bird.x;
+          const birdRight = gameState.bird.x + gameState.bird.width;
+          const birdTop = gameState.bird.y;
+          const birdBottom = gameState.bird.y + gameState.bird.height;
+
+          if (birdRight > pipe.x && birdLeft < pipe.x + pipe.width) {
+            if (birdTop < pipe.gapY || birdBottom > pipe.gapY + pipe.gapSize) {
+              gameState.gameOver = true;
+              audioManager.playGameOver();
+              if (gameState.score > highScore) {
+                setHighScore(gameState.score);
+                localStorage.setItem('flappySharkHighScore', gameState.score.toString());
+              }
+            }
+          }
+        });
+
+        // Detectar colisiones con bordes
+        if (gameState.bird.y < 0 || gameState.bird.y + gameState.bird.height > canvas.height) {
+          gameState.gameOver = true;
+          audioManager.playGameOver();
+          if (gameState.score > highScore) {
+            setHighScore(gameState.score);
+            localStorage.setItem('flappySharkHighScore', gameState.score.toString());
+          }
+        }
+      }
+
+      // Dibujar pájaro (tiburón)
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.ellipse(gameState.bird.x + 10, gameState.bird.y + 10, 10, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ojos del tiburón
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(gameState.bird.x + 14, gameState.bird.y + 8, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Aleta
+      ctx.fillStyle = '#FF8C00';
+      ctx.beginPath();
+      ctx.moveTo(gameState.bird.x + 15, gameState.bird.y + 5);
+      ctx.lineTo(gameState.bird.x + 20, gameState.bird.y - 2);
+      ctx.lineTo(gameState.bird.x + 18, gameState.bird.y + 10);
+      ctx.fill();
+
+      // Dibujar pipes
+      ctx.fillStyle = '#228B22';
+      gameState.pipes.forEach((pipe) => {
+        // Tubo superior
+        ctx.fillRect(pipe.x, 0, pipe.width, pipe.gapY);
+        // Tubo inferior
+        ctx.fillRect(pipe.x, pipe.gapY + pipe.gapSize, pipe.width, canvas.height - (pipe.gapY + pipe.gapSize));
+
+        // Borde de pipes
+        ctx.strokeStyle = '#1a6b1a';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(pipe.x, 0, pipe.width, pipe.gapY);
+        ctx.strokeRect(pipe.x, pipe.gapY + pipe.gapSize, pipe.width, canvas.height - (pipe.gapY + pipe.gapSize));
+      });
+
+      // Dibujar score
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 24px Arial';
+      ctx.fillText(`Score: ${gameState.score}`, 10, 30);
+
+      if (!gameState.gameStarted) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('🦈 Click to Start!', canvas.width / 2, canvas.height / 2);
+        ctx.font = '14px Arial';
+        ctx.fillText('Avoid the pipes!', canvas.width / 2, canvas.height / 2 + 30);
+      }
+
+      if (gameState.gameOver) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 28px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.font = 'bold 20px Arial';
+        ctx.fillText(`Final Score: ${gameState.score}`, canvas.width / 2, canvas.height / 2 + 20);
+        ctx.font = '14px Arial';
+        ctx.fillText('Click to Restart', canvas.width / 2, canvas.height / 2 + 50);
+      }
 
       requestAnimationFrame(gameLoop);
     };
 
-    const handleClick = () => {
-      const state = gameStateRef.current;
-      if (!state.gameRunning) {
-        // Reset game
-        state.birdY = 150;
-        state.birdVelocity = 0;
-        state.pipes = [];
-        state.score = 0;
-        state.gameRunning = true;
-        setScore(0);
-        setGameOver(false);
-        lastPipeX = 300;
-        gameLoop();
-      } else {
-        state.birdVelocity = JUMP_STRENGTH;
-      }
-    };
-
-    canvas.addEventListener('click', handleClick);
     gameLoop();
 
     return () => {
       canvas.removeEventListener('click', handleClick);
+      window.removeEventListener('keydown', handleKeyPress);
     };
-  }, []);
+  }, [highScore]);
 
   return (
     <GameContainer>
-      <Instructions>
-        🌊 FlappyShark - Click to jump, avoid pipes! {gameOver && '- GAME OVER!'}
-      </Instructions>
-      <Canvas ref={canvasRef} width={400} height={300} />
       <ScoreBoard>
         <ScoreItem>Score: {score}</ScoreItem>
-        <ScoreItem>{gameOver ? 'Game Over' : 'Playing'}</ScoreItem>
+        <ScoreItem>High: {highScore}</ScoreItem>
       </ScoreBoard>
+      <Canvas ref={canvasRef} width={400} height={300} />
+      <Instructions>Click or Space to Jump • Avoid Pipes!</Instructions>
     </GameContainer>
   );
 }
