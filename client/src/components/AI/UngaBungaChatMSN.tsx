@@ -67,22 +67,36 @@ const MessagesContainer = styled.div`
   }
 `;
 
-const Message = styled.div<{ $isUser?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: ${(props) => (props.$isUser ? 'flex-end' : 'flex-start')};
-  gap: 4px;
-  width: 100%;
-`;
-
-const MessageBubble = styled.div<{ $isUser?: boolean }>`
-  background: ${(props) => (props.$isUser ? '#0000ff' : '#dfdfdf')};
-  color: ${(props) => (props.$isUser ? '#fff' : '#000')};
+const MessageBubbleUser = styled.div`
+  background: #0000ff;
+  color: #fff;
   padding: 8px 12px;
   border-radius: 4px;
   max-width: 70%;
   word-wrap: break-word;
-  border: 1px solid ${(props) => (props.$isUser ? '#000080' : '#808080')};
+  border: 1px solid #000080;
+  animation: slideIn 0.3s ease;
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const MessageBubbleBot = styled.div`
+  background: #dfdfdf;
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 4px;
+  max-width: 70%;
+  word-wrap: break-word;
+  border: 1px solid #808080;
   animation: slideIn 0.3s ease;
 
   @keyframes slideIn {
@@ -245,15 +259,19 @@ export function UngaBungaChatMSN() {
       <MessagesContainer>
         {messages.map((msg) => (
           <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.isUser ? 'flex-end' : 'flex-start', gap: '4px' }}>
-            <MessageBubble $isUser={msg.isUser}>{msg.text}</MessageBubble>
+            {msg.isUser ? (
+              <MessageBubbleUser>{msg.text}</MessageBubbleUser>
+            ) : (
+              <MessageBubbleBot>{msg.text}</MessageBubbleBot>
+            )}
             <Timestamp>{msg.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</Timestamp>
           </div>
         ))}
         {isTyping && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
-            <MessageBubble $isUser={false}>
+            <MessageBubbleBot>
               <span style={{ animation: 'blink 1s infinite' }}>...</span>
-            </MessageBubble>
+            </MessageBubbleBot>
           </div>
         )}
         <div ref={messagesEndRef} />
