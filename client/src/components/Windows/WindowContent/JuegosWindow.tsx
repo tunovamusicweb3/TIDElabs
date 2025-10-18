@@ -2,14 +2,25 @@
 
 import { useState } from 'react';
 import styled from 'styled-components';
+import { FlappyShark } from '@/components/Games/FlappyShark';
+import { MemoryGame } from '@/components/Games/MemoryGame';
+import { SnakeGame } from '@/components/Games/SnakeGame';
 
 const Content = styled.div`
-  padding: 16px;
+  padding: 0;
   overflow-y: auto;
   height: 100%;
   background: #c0c0c0;
   font-family: 'MS Sans Serif', Arial, sans-serif;
   font-size: 11px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const MenuContainer = styled.div`
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
 `;
 
 const Title = styled.h2`
@@ -18,6 +29,7 @@ const Title = styled.h2`
   margin-bottom: 12px;
   color: #000080;
   text-align: center;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
 `;
 
 const GameGrid = styled.div`
@@ -36,25 +48,34 @@ const GameCard = styled.button`
   text-align: center;
   font-family: 'MS Sans Serif', Arial, sans-serif;
   font-size: 11px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
     background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.5);
   }
 
   &:active {
     border-color: #808080 #dfdfdf #dfdfdf #808080;
+    transform: scale(0.98);
   }
 `;
 
 const GameEmoji = styled.div`
   font-size: 32px;
   margin-bottom: 8px;
+  transition: transform 0.2s ease;
+
+  ${GameCard}:hover & {
+    transform: scale(1.1);
+  }
 `;
 
 const GameName = styled.div`
   font-weight: bold;
   font-size: 11px;
+  color: #000080;
 `;
 
 const GameDescription = styled.div`
@@ -67,7 +88,7 @@ const ScoreBoardBox = styled.div`
   border: 2px solid;
   border-color: #dfdfdf #808080 #808080 #dfdfdf;
   padding: 12px;
-  background: #c0c0c0;
+  background: linear-gradient(135deg, #c0c0c0 0%, #dfdfdf 100%);
   margin-top: 12px;
 `;
 
@@ -76,17 +97,42 @@ const ScoreTitle = styled.h3`
   font-weight: bold;
   margin-bottom: 8px;
   color: #000080;
+  border-bottom: 2px solid #000080;
+  padding-bottom: 4px;
 `;
 
 const ScoreItem = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 4px 0;
+  padding: 6px 0;
   border-bottom: 1px dotted #808080;
   font-size: 10px;
 
   &:last-child {
     border-bottom: none;
+  }
+`;
+
+const BackButton = styled.button`
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
+  border: 2px solid;
+  border-color: #dfdfdf #808080 #808080 #dfdfdf;
+  cursor: pointer;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  transition: all 0.1s ease;
+  margin: 12px;
+
+  &:hover {
+    background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    border-color: #808080 #dfdfdf #dfdfdf #808080;
   }
 `;
 
@@ -96,12 +142,6 @@ const games = [
     name: 'FlappyShark',
     emoji: '🦈',
     description: 'Evita los obstáculos',
-  },
-  {
-    id: 'runner',
-    name: 'UngaBunga Runner',
-    emoji: '🏃',
-    description: 'Corre por el código',
   },
   {
     id: 'memory',
@@ -115,51 +155,50 @@ const games = [
     emoji: '🐍',
     description: 'Come los tokens',
   },
+  {
+    id: 'coming',
+    name: 'Próximamente',
+    emoji: '🎮',
+    description: 'Más juegos retro',
+  },
 ];
 
 const topScores = [
   { name: 'Web3Sh4rK', score: 9999, game: 'FlappyShark' },
-  { name: 'UngaBunga', score: 8765, game: 'Runner' },
-  { name: 'Nakama #42', score: 7654, game: 'Memory' },
+  { name: 'UngaBunga', score: 8765, game: 'Memory' },
+  { name: 'Nakama #42', score: 7654, game: 'Snake' },
 ];
 
 export function JuegosWindow() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
 
   const handleGameClick = (gameId: string) => {
-    setSelectedGame(gameId);
-    // En una implementación real, aquí se cargaría el juego
+    if (gameId !== 'coming') {
+      setSelectedGame(gameId);
+    }
   };
 
   return (
     <Content>
-      <Title>🎮 ARCADE RETRO</Title>
-
       {selectedGame ? (
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ marginBottom: '12px' }}>
-            El juego "{games.find((g) => g.id === selectedGame)?.name}" se cargaría aquí.
-          </p>
-          <button
-            onClick={() => setSelectedGame(null)}
-            style={{
-              padding: '6px 12px',
-              background: 'linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%)',
-              border: '2px solid',
-              borderColor: '#dfdfdf #808080 #808080 #dfdfdf',
-              cursor: 'pointer',
-              fontFamily: 'MS Sans Serif',
-              fontSize: '11px',
-            }}
-          >
-            ← Volver
-          </button>
-        </div>
-      ) : (
         <>
+          {selectedGame === 'flappy' && <FlappyShark />}
+          {selectedGame === 'memory' && <MemoryGame />}
+          {selectedGame === 'snake' && <SnakeGame />}
+          <BackButton onClick={() => setSelectedGame(null)}>← Volver al Menú</BackButton>
+        </>
+      ) : (
+        <MenuContainer>
+          <Title>🎮 ARCADE RETRO NAKAMA</Title>
+
           <GameGrid>
             {games.map((game) => (
-              <GameCard key={game.id} onClick={() => handleGameClick(game.id)}>
+              <GameCard
+                key={game.id}
+                onClick={() => handleGameClick(game.id)}
+                disabled={game.id === 'coming'}
+                style={{ opacity: game.id === 'coming' ? 0.6 : 1 }}
+              >
                 <GameEmoji>{game.emoji}</GameEmoji>
                 <GameName>{game.name}</GameName>
                 <GameDescription>{game.description}</GameDescription>
@@ -178,7 +217,7 @@ export function JuegosWindow() {
               </ScoreItem>
             ))}
           </ScoreBoardBox>
-        </>
+        </MenuContainer>
       )}
     </Content>
   );
