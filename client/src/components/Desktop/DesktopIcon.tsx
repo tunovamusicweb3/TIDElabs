@@ -1,71 +1,63 @@
-'use client';
-
 import styled from 'styled-components';
-import { audioManager } from '@/lib/audio/audioManager';
 
-const IconContainer = styled.div<{ $isSelected?: boolean }>`
+const IconContainer = styled.div<{ $isSelected: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
+  gap: 6px;
   padding: 8px;
-  border-radius: 2px;
-  background: ${(props) => (props.$isSelected ? 'rgba(0, 0, 128, 0.4)' : 'transparent')};
-  border: ${(props) => (props.$isSelected ? '1px dashed #000080' : '1px solid transparent')};
+  cursor: pointer;
   user-select: none;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px;
+  border: 2px dashed transparent;
+
+  ${(props) =>
+    props.$isSelected &&
+    `
+    border-color: #000080;
+    background: rgba(0, 0, 128, 0.15);
+  `}
 
   &:hover {
-    background: rgba(0, 0, 128, 0.25);
-    border: 1px dashed rgba(0, 0, 128, 0.7);
+    border-color: #000080;
+    background: rgba(0, 0, 128, 0.2);
+    transform: scale(1.08);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 128, 0.3));
   }
 
   &:active {
-    background: rgba(0, 0, 128, 0.35);
-    transform: scale(0.98);
+    transform: scale(0.95);
   }
 `;
 
-const IconImage = styled.div`
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  background: linear-gradient(135deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
-  border: 2px solid;
-  border-color: #dfdfdf #808080 #808080 #dfdfdf;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.2));
+const IconEmoji = styled.div`
+  font-size: 48px;
+  line-height: 1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 
   ${IconContainer}:hover & {
-    transform: scale(1.08);
-    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
-  }
-
-  ${IconContainer}:active & {
-    transform: scale(0.95);
+    transform: scale(1.15) rotate(-5deg);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 128, 0.4));
   }
 `;
 
 const IconLabel = styled.div`
   font-size: 11px;
+  font-weight: 500;
   text-align: center;
   color: #000;
-  font-weight: 500;
-  max-width: 60px;
-  word-wrap: break-word;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9);
-  line-height: 1.3;
-  transition: color 0.2s ease;
+  word-break: break-word;
+  max-width: 80px;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
 
   ${IconContainer}:hover & {
     color: #000080;
     font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 128, 0.3);
   }
 `;
 
@@ -73,41 +65,25 @@ interface DesktopIconProps {
   id: string;
   label: string;
   emoji: string;
-  onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => void;
   isSelected?: boolean;
-  onSelect?: () => void;
-  title?: string;
+  onDoubleClick?: (event: React.MouseEvent) => void;
 }
 
 export function DesktopIcon({
   id,
   label,
   emoji,
+  isSelected = false,
   onDoubleClick,
-  isSelected,
-  onSelect,
 }: DesktopIconProps) {
-  const handleDoubleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    audioManager.playWindowOpen();
-    onDoubleClick(event);
-  };
-
-  const handleClick = () => {
-    audioManager.playClick();
-    onSelect?.();
-  };
-
   return (
     <IconContainer
-      id={id}
       $isSelected={isSelected}
-      onDoubleClick={handleDoubleClick}
-      onClick={handleClick}
-      title={label}
+      onDoubleClick={onDoubleClick}
+      title={`Doble clic para abrir ${label}`}
     >
-      <IconImage>{emoji}</IconImage>
+      <IconEmoji>{emoji}</IconEmoji>
       <IconLabel>{label}</IconLabel>
     </IconContainer>
   );
 }
-
