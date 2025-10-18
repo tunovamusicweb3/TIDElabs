@@ -12,6 +12,7 @@ import { VHSNoise } from '../Effects/VHSNoise';
 import { BootScreen } from '../Effects/BootScreen';
 import { UngaBungaChat } from '../AI/UngaBungaChat';
 import { FloatingEmojisManager } from '../Effects/FloatingEmojis';
+import { UngaBungaAvatar } from '../AI/UngaBungaAvatar';
 
 const DesktopContainer = styled.div`
   width: 100%;
@@ -60,7 +61,8 @@ export function Desktop({ showBootScreen = true }: DesktopProps) {
   const [startMenuOpen, setStartMenuOpen] = useState(false);
   const [showBoot, setShowBoot] = useState(showBootScreen);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
-  const [floatingEmojis, setFloatingEmojis] = useState<Array<{ id: string; emoji: string; x: number; y: number }>>([]);
+  const [floatingEmojis, setFloatingEmojis] = useState<Array<{ id: string; emoji: string; x: number; y: number }>>([])
+  const [chatOpen, setChatOpen] = useState(false);
   const openWindow = useWindowStore((state) => state.openWindow);
 
   useEffect(() => {
@@ -108,8 +110,9 @@ export function Desktop({ showBootScreen = true }: DesktopProps) {
         </IconGrid>
 
         <WindowManager />
-        <UngaBungaChat />
+        {chatOpen && <UngaBungaChat />}
         <FloatingEmojisManager emojis={floatingEmojis} onRemove={handleRemoveEmoji} />
+        <UngaBungaAvatar onChatClick={() => setChatOpen(!chatOpen)} isMinimized={chatOpen} />
 
         <Taskbar onStartClick={() => setStartMenuOpen(!startMenuOpen)} />
         <StartMenu isOpen={startMenuOpen} onClose={() => setStartMenuOpen(false)} />
