@@ -17,9 +17,22 @@ const TaskbarContainer = styled.div`
   padding: 2px;
   gap: 2px;
   z-index: 1000;
-  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-family: 'MS Sans Serif', 'Courier Prime', monospace;
   font-size: 11px;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    height: 32px;
+    padding: 2px 4px;
+    gap: 1px;
+  }
+
+  @media (max-width: 480px) {
+    height: 36px;
+    padding: 3px 4px;
+    gap: 2px;
+  }
 `;
 
 const StartButton = styled.button`
@@ -32,11 +45,13 @@ const StartButton = styled.button`
   display: flex;
   align-items: center;
   gap: 4px;
-  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-family: 'MS Sans Serif', 'Courier Prime', monospace;
   font-size: 11px;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 0 rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  flex-shrink: 0;
 
   &:active {
     border-color: #808080 #dfdfdf #dfdfdf #808080;
@@ -47,6 +62,18 @@ const StartButton = styled.button`
   &:hover {
     background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #a0a0a0 100%);
     box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.8), inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    padding: 3px 8px;
+    font-size: 10px;
+    gap: 3px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 4px 6px;
+    font-size: 9px;
+    gap: 2px;
   }
 `;
 
@@ -59,13 +86,27 @@ const Clock = styled.div`
   background: linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
   border: 2px solid;
   border-color: #808080 #dfdfdf #dfdfdf #808080;
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier Prime', 'Courier New', monospace;
   font-size: 11px;
   min-width: 50px;
   text-align: center;
   font-weight: bold;
   color: #000080;
   box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 0 rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    padding: 3px 6px;
+    font-size: 10px;
+    min-width: 45px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 4px 4px;
+    font-size: 9px;
+    min-width: 40px;
+  }
 `;
 
 const TaskButton = styled.button<{ $isActive?: boolean }>`
@@ -80,7 +121,7 @@ const TaskButton = styled.button<{ $isActive?: boolean }>`
       ? '#808080 #dfdfdf #dfdfdf #808080'
       : '#dfdfdf #808080 #808080 #dfdfdf'};
   cursor: pointer;
-  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-family: 'MS Sans Serif', 'Courier Prime', monospace;
   font-size: 11px;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
@@ -92,6 +133,19 @@ const TaskButton = styled.button<{ $isActive?: boolean }>`
     props.$isActive
       ? 'inset -1px -1px 0 rgba(255, 255, 255, 0.5), inset 1px 1px 0 rgba(0, 0, 0, 0.2)'
       : 'inset 1px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 0 rgba(0, 0, 0, 0.2)'};
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    padding: 3px 6px;
+    font-size: 10px;
+    max-width: 120px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 4px 4px;
+    font-size: 9px;
+    max-width: 80px;
+  }
 
   &:hover {
     background: ${(props) =>
@@ -106,10 +160,11 @@ const TaskButton = styled.button<{ $isActive?: boolean }>`
 `;
 
 interface TaskbarProps {
-  onStartClick?: () => void;
+  startMenuOpen?: boolean;
+  onStartMenuToggle?: () => void;
 }
 
-export function Taskbar({ onStartClick }: TaskbarProps) {
+export function Taskbar({ startMenuOpen, onStartMenuToggle }: TaskbarProps) {
   const windows = useWindowStore((state) => state.windows);
   const [time, setTime] = useState(new Date());
   const focusWindow = useWindowStore((state) => state.focusWindow);
@@ -123,7 +178,7 @@ export function Taskbar({ onStartClick }: TaskbarProps) {
 
   const handleStartClick = () => {
     audioManager.playClick();
-    onStartClick?.();
+    onStartMenuToggle?.();
   };
 
   const handleTaskClick = (windowId: string) => {

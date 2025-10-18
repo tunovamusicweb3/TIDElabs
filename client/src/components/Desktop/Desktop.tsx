@@ -177,7 +177,7 @@ export function Desktop({ showBootScreen = true }: DesktopProps) {
       <WindowManager />
       <UngaBungaAvatar onChatClick={() => setChatOpen(!chatOpen)} />
       {chatOpen && <UngaBungaChat />}
-      <Taskbar onStartClick={() => setStartMenuOpen(!startMenuOpen)} />
+      <Taskbar startMenuOpen={startMenuOpen} onStartMenuToggle={() => setStartMenuOpen(!startMenuOpen)} />
       {startMenuOpen && <StartMenu isOpen={startMenuOpen} onClose={() => setStartMenuOpen(false)} />}
     </DesktopContainer>
   );
