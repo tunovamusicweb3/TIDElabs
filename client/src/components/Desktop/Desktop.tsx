@@ -11,6 +11,7 @@ import { CRTScanlines } from '../Effects/CRTScanlines';
 import { VHSNoise } from '../Effects/VHSNoise';
 import { BootScreen } from '../Effects/BootScreen';
 import { UngaBungaChat } from '../AI/UngaBungaChat';
+import { FloatingEmojisManager } from '../Effects/FloatingEmojis';
 
 const DesktopContainer = styled.div`
   width: 100%;
@@ -59,6 +60,7 @@ export function Desktop({ showBootScreen = true }: DesktopProps) {
   const [startMenuOpen, setStartMenuOpen] = useState(false);
   const [showBoot, setShowBoot] = useState(showBootScreen);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
+  const [floatingEmojis, setFloatingEmojis] = useState<Array<{ id: string; emoji: string; x: number; y: number }>>([]);
   const openWindow = useWindowStore((state) => state.openWindow);
 
   useEffect(() => {
@@ -68,8 +70,22 @@ export function Desktop({ showBootScreen = true }: DesktopProps) {
     }, 4000);
   }, [openWindow]);
 
-  const handleIconDoubleClick = (id: string, label: string) => {
+  const handleIconDoubleClick = (id: string, label: string, event: React.MouseEvent) => {
     openWindow(id, label);
+    
+    // Crear emoji flotante
+    const emoji = icons.find(i => i.id === id)?.emoji || '✨';
+    const newEmoji = {
+      id: `emoji-${Date.now()}-${Math.random()}`,
+      emoji,
+      x: event.clientX,
+      y: event.clientY,
+    };
+    setFloatingEmojis((prev) => [...prev, newEmoji]);
+  };
+
+  const handleRemoveEmoji = (id: string) => {
+    setFloatingEmojis((prev) => prev.filter((e) => e.id !== id));
   };
 
   return (
@@ -86,13 +102,14 @@ export function Desktop({ showBootScreen = true }: DesktopProps) {
               emoji={icon.emoji}
               isSelected={selectedIcon === icon.id}
               onSelect={() => setSelectedIcon(icon.id)}
-              onDoubleClick={() => handleIconDoubleClick(icon.id, icon.label)}
+              onDoubleClick={(e) => handleIconDoubleClick(icon.id, icon.label, e)}
             />
           ))}
         </IconGrid>
 
         <WindowManager />
         <UngaBungaChat />
+        <FloatingEmojisManager emojis={floatingEmojis} onRemove={handleRemoveEmoji} />
 
         <Taskbar onStartClick={() => setStartMenuOpen(!startMenuOpen)} />
         <StartMenu isOpen={startMenuOpen} onClose={() => setStartMenuOpen(false)} />

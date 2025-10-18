@@ -73,7 +73,7 @@ interface DesktopIconProps {
   id: string;
   label: string;
   emoji: string;
-  onDoubleClick: () => void;
+  onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => void;
   isSelected?: boolean;
   onSelect?: () => void;
   title?: string;
@@ -87,9 +87,9 @@ export function DesktopIcon({
   isSelected,
   onSelect,
 }: DesktopIconProps) {
-  const handleDoubleClick = () => {
+  const handleDoubleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     audioManager.playWindowOpen();
-    onDoubleClick();
+    onDoubleClick(event);
   };
 
   const handleClick = () => {
