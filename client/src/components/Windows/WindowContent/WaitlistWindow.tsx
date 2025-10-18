@@ -66,12 +66,12 @@ const Button = styled.button`
   }
 `;
 
-const Message = styled.div<{ type?: 'success' | 'error' }>`
+const Message = styled.div<{ $type?: 'success' | 'error' }>`
   padding: 12px;
   margin-bottom: 12px;
   border: 2px solid;
-  border-color: ${(props) => (props.type === 'success' ? '#00aa00' : '#ff0000')};
-  background: ${(props) => (props.type === 'success' ? '#e0ffe0' : '#ffe0e0')};
+  border-color: ${(props) => (props.$type === 'success' ? '#00aa00' : '#ff0000')};
+  background: ${(props) => (props.$type === 'success' ? '#e0ffe0' : '#ffe0e0')};
   font-size: 11px;
 `;
 
@@ -124,12 +124,12 @@ export function WaitlistWindow() {
       <Title>📋 WAITLIST NAKAMA</Title>
 
       {submitted && (
-        <Message type="success">
+        <Message $type="success">
           ✓ ¡Bienvenido a la familia Nakama! Te hemos agregado a la lista de espera.
         </Message>
       )}
 
-      {error && <Message type="error">✕ {error}</Message>}
+      {error && <Message $type="error">✕ {error}</Message>}
 
       <FormBox>
         <form onSubmit={handleSubmit}>

@@ -28,12 +28,12 @@ const Subtitle = styled.p`
   color: #333;
 `;
 
-const PathBox = styled.div<{ isSelected?: boolean }>`
+const PathBox = styled.div<{ $isSelected?: boolean }>`
   border: 2px solid;
-  border-color: ${(props) => (props.isSelected ? '#0000ff #808080 #808080 #0000ff' : '#dfdfdf #808080 #808080 #dfdfdf')};
+  border-color: ${(props) => (props.$isSelected ? '#0000ff #808080 #808080 #0000ff' : '#dfdfdf #808080 #808080 #dfdfdf')};
   padding: 12px;
   margin-bottom: 12px;
-  background: ${(props) => (props.isSelected ? '#e0e0ff' : '#c0c0c0')};
+  background: ${(props) => (props.$isSelected ? '#e0e0ff' : '#c0c0c0')};
   cursor: pointer;
 `;
 
@@ -154,7 +154,7 @@ export function DonateWindow() {
       <Title>💰 La Gran Cruzada Nakama</Title>
       <Subtitle>"No queremos tu dinero. Queremos tu FE en lo imposible."</Subtitle>
 
-      <PathBox isSelected={path === 'web3'} onClick={() => setPath('web3')}>
+      <PathBox $isSelected={path === 'web3'} onClick={() => setPath('web3')}>
         <PathTitle>🌊 CAMINO WEB3 (RECOMENDADO)</PathTitle>
         <p>Dona directamente con crypto</p>
 
@@ -184,7 +184,7 @@ export function DonateWindow() {
         )}
       </PathBox>
 
-      <PathBox isSelected={path === 'traditional'} onClick={() => setPath('traditional')}>
+      <PathBox $isSelected={path === 'traditional'} onClick={() => setPath('traditional')}>
         <PathTitle>💳 CAMINO TRADICIONAL (Menor Beneficios)</PathTitle>
         <p>Si prefieres fiat, apoya en nuestras plataformas establecidas:</p>
 

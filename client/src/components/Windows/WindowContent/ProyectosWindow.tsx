@@ -19,15 +19,15 @@ const TabContainer = styled.div`
   border-bottom: 2px solid #808080;
 `;
 
-const Tab = styled.button<{ isActive?: boolean }>`
+const Tab = styled.button<{ $isActive?: boolean }>`
   padding: 4px 12px;
   background: ${(props) =>
-    props.isActive
+    props.$isActive
       ? 'linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%)'
       : 'linear-gradient(180deg, #808080 0%, #dfdfdf 50%, #c0c0c0 100%)'};
   border: 2px solid;
   border-color: ${(props) =>
-    props.isActive
+    props.$isActive
       ? '#dfdfdf #808080 #808080 #dfdfdf'
       : '#808080 #dfdfdf #dfdfdf #808080'};
   cursor: pointer;
@@ -119,11 +119,11 @@ export function ProyectosWindow() {
   return (
     <Content>
       <TabContainer>
-        <Tab isActive={activeTab === 'all'} onClick={() => setActiveTab('all')}>
+        <Tab $isActive={activeTab === 'all'} onClick={() => setActiveTab('all')}>
           Todos
         </Tab>
         {projects.map((p) => (
-          <Tab key={p.id} isActive={activeTab === p.id} onClick={() => setActiveTab(p.id)}>
+          <Tab key={p.id} $isActive={activeTab === p.id} onClick={() => setActiveTab(p.id)}>
             {p.emoji}
           </Tab>
         ))}
