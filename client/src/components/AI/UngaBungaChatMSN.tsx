@@ -72,6 +72,7 @@ const Message = styled.div<{ $isUser?: boolean }>`
   flex-direction: column;
   align-items: ${(props) => (props.$isUser ? 'flex-end' : 'flex-start')};
   gap: 4px;
+  width: 100%;
 `;
 
 const MessageBubble = styled.div<{ $isUser?: boolean }>`
@@ -243,17 +244,17 @@ export function UngaBungaChatMSN() {
 
       <MessagesContainer>
         {messages.map((msg) => (
-          <Message key={msg.id} $isUser={msg.isUser}>
+          <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.isUser ? 'flex-end' : 'flex-start', gap: '4px' }}>
             <MessageBubble $isUser={msg.isUser}>{msg.text}</MessageBubble>
             <Timestamp>{msg.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</Timestamp>
-          </Message>
+          </div>
         ))}
         {isTyping && (
-          <Message>
-            <MessageBubble>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+            <MessageBubble $isUser={false}>
               <span style={{ animation: 'blink 1s infinite' }}>...</span>
             </MessageBubble>
-          </Message>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </MessagesContainer>
