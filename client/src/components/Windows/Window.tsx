@@ -13,7 +13,12 @@ const WindowFrame = styled.div`
   background: linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
   border: 2px solid;
   border-color: #dfdfdf #808080 #808080 #dfdfdf;
-  box-shadow: 1px 1px 0 #fff, -1px -1px 0 #808080;
+  box-shadow: 1px 1px 0 #fff, -1px -1px 0 #808080, 2px 2px 8px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 1px 1px 0 #fff, -1px -1px 0 #808080, 3px 3px 12px rgba(0, 0, 0, 0.4);
+  }
 `;
 
 const TitleBar = styled.div`
@@ -28,6 +33,7 @@ const TitleBar = styled.div`
   font-family: 'MS Sans Serif', Arial, sans-serif;
   cursor: move;
   user-select: none;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 `;
 
 const TitleText = styled.div`
@@ -53,13 +59,16 @@ const WindowButton = styled.button`
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  transition: all 0.1s ease;
 
   &:active {
     border-color: #808080 #dfdfdf #dfdfdf #808080;
+    transform: scale(0.95);
   }
 
   &:hover {
     background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
   }
 `;
 
@@ -67,6 +76,29 @@ const Content = styled.div`
   flex: 1;
   overflow: auto;
   background: #c0c0c0;
+  scrollbar-width: thin;
+  scrollbar-color: #808080 #c0c0c0;
+
+  &::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: linear-gradient(90deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
+    border: 1px solid;
+    border-color: #dfdfdf #808080 #808080 #dfdfdf;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    border: 1px solid;
+    border-color: #dfdfdf #808080 #808080 #dfdfdf;
+
+    &:hover {
+      background: linear-gradient(90deg, #e0e0e0 0%, #d0d0d0 50%, #909090 100%);
+    }
+  }
 `;
 
 interface WindowProps {
@@ -122,8 +154,8 @@ export function Window({ window, children }: WindowProps) {
       style={{ zIndex: window.zIndex }}
       onMouseDown={() => focusWindow(window.id)}
       dragHandleClassName="window-drag-handle"
-      minWidth={200}
-      minHeight={100}
+      minWidth={250}
+      minHeight={150}
       bounds="parent"
     >
       <WindowFrame>

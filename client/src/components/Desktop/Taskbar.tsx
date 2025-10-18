@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useWindowStore } from '@/lib/window/windowStore';
+import { audioManager } from '@/lib/audio/audioManager';
 
 const TaskbarContainer = styled.div`
   position: fixed;
@@ -20,6 +21,7 @@ const TaskbarContainer = styled.div`
   z-index: 1000;
   font-family: 'MS Sans Serif', Arial, sans-serif;
   font-size: 11px;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 const StartButton = styled.button`
@@ -34,13 +36,16 @@ const StartButton = styled.button`
   gap: 4px;
   font-family: 'MS Sans Serif', Arial, sans-serif;
   font-size: 11px;
+  transition: all 0.1s ease;
 
   &:active {
     border-color: #808080 #dfdfdf #dfdfdf #808080;
+    transform: scale(0.97);
   }
 
   &:hover {
     background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
   }
 `;
 
@@ -57,17 +62,19 @@ const Clock = styled.div`
   font-size: 11px;
   min-width: 50px;
   text-align: center;
+  font-weight: bold;
+  color: #000080;
 `;
 
-const TaskButton = styled.button<{ isActive?: boolean }>`
+const TaskButton = styled.button<{ $isActive?: boolean }>`
   padding: 2px 8px;
   background: ${(props) =>
-    props.isActive
+    props.$isActive
       ? 'linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%)'
       : 'linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%)'};
   border: 2px solid;
   border-color: ${(props) =>
-    props.isActive
+    props.$isActive
       ? '#808080 #dfdfdf #dfdfdf #808080'
       : '#dfdfdf #808080 #808080 #dfdfdf'};
   cursor: pointer;
@@ -77,9 +84,15 @@ const TaskButton = styled.button<{ isActive?: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: all 0.1s ease;
 
   &:hover {
     background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
@@ -103,6 +116,7 @@ export function Taskbar({ onStartClick }: TaskbarProps) {
   }, []);
 
   const handleTaskClick = (windowId: string) => {
+    audioManager.playClick();
     const window = windows[windowId];
     if (window?.isMinimized) {
       restoreWindow(windowId);
@@ -110,9 +124,14 @@ export function Taskbar({ onStartClick }: TaskbarProps) {
     focusWindow(windowId);
   };
 
+  const handleStartClick = () => {
+    audioManager.playClick();
+    onStartClick?.();
+  };
+
   return (
     <TaskbarContainer>
-      <StartButton onClick={onStartClick}>
+      <StartButton onClick={handleStartClick}>
         <span>🪟</span>
         <span>Start</span>
       </StartButton>
@@ -124,8 +143,9 @@ export function Taskbar({ onStartClick }: TaskbarProps) {
         .map((window) => (
           <TaskButton
             key={window.id}
-            isActive={!window.isMinimized}
+            $isActive={!window.isMinimized}
             onClick={() => handleTaskClick(window.id)}
+            title={window.title}
           >
             {window.title}
           </TaskButton>

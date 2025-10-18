@@ -18,6 +18,7 @@ const Title = styled.h2`
   margin-bottom: 8px;
   color: #000080;
   text-align: center;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
 `;
 
 const Subtitle = styled.p`
@@ -26,15 +27,28 @@ const Subtitle = styled.p`
   text-align: center;
   margin-bottom: 16px;
   color: #333;
+  background: #ffffcc;
+  padding: 8px;
+  border: 1px solid #ffaa00;
 `;
 
 const PathBox = styled.div<{ $isSelected?: boolean }>`
   border: 2px solid;
-  border-color: ${(props) => (props.$isSelected ? '#0000ff #808080 #808080 #0000ff' : '#dfdfdf #808080 #808080 #dfdfdf')};
+  border-color: ${(props) =>
+    props.$isSelected ? '#0000ff #808080 #808080 #0000ff' : '#dfdfdf #808080 #808080 #dfdfdf'};
   padding: 12px;
   margin-bottom: 12px;
-  background: ${(props) => (props.$isSelected ? '#e0e0ff' : '#c0c0c0')};
+  background: ${(props) =>
+    props.$isSelected
+      ? 'linear-gradient(135deg, #e0e0ff 0%, #f0f0ff 100%)'
+      : 'linear-gradient(135deg, #c0c0c0 0%, #dfdfdf 100%)'};
   cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #0000ff #808080 #808080 #0000ff;
+    box-shadow: inset 0 0 4px rgba(0, 0, 128, 0.15);
+  }
 `;
 
 const PathTitle = styled.h3`
@@ -74,6 +88,13 @@ const Input = styled.input`
   font-size: 11px;
   margin: 8px 0;
   box-sizing: border-box;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #0000ff #dfdfdf #dfdfdf #0000ff;
+    background: #fffff0;
+  }
 `;
 
 const Button = styled.button`
@@ -87,13 +108,42 @@ const Button = styled.button`
   font-family: 'MS Sans Serif', Arial, sans-serif;
   font-size: 11px;
   margin-top: 8px;
+  transition: all 0.1s ease;
 
   &:active {
     border-color: #808080 #dfdfdf #dfdfdf #808080;
+    transform: scale(0.98);
   }
 
   &:hover {
     background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
+  }
+`;
+
+const LinkButton = styled.a`
+  display: block;
+  padding: 6px;
+  background: linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
+  border: 2px solid;
+  border-color: #dfdfdf #808080 #808080 #dfdfdf;
+  text-align: center;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  margin-top: 4px;
+  transition: all 0.1s ease;
+
+  &:hover {
+    background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
@@ -115,6 +165,16 @@ const ProgressBar = styled.div`
     height: 100%;
     width: 67%;
     background: linear-gradient(90deg, #0000ff, #00ffff);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
   }
 `;
 
@@ -123,25 +183,21 @@ const ProgressText = styled.div`
   text-align: center;
   font-weight: bold;
   margin-top: 4px;
+  color: #000080;
 `;
 
-const LinkButton = styled.a`
-  display: block;
-  padding: 6px;
-  background: linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
+const WarningBox = styled.div`
+  background: #ffe0e0;
   border: 2px solid;
-  border-color: #dfdfdf #808080 #808080 #dfdfdf;
-  text-align: center;
-  text-decoration: none;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  font-family: 'MS Sans Serif', Arial, sans-serif;
-  font-size: 11px;
-  margin-top: 4px;
+  border-color: #ff0000 #808080 #808080 #ff0000;
+  padding: 12px;
+  margin: 12px 0;
+  font-size: 10px;
+  line-height: 1.5;
 
-  &:hover {
-    background: linear-gradient(180deg, #dfdfdf 0%, #c0c0c0 50%, #808080 100%);
+  h4 {
+    margin: 0 0 8px 0;
+    color: #ff0000;
   }
 `;
 
@@ -209,13 +265,13 @@ export function DonateWindow() {
         )}
       </PathBox>
 
-      <div style={{ marginTop: '16px', padding: '12px', background: '#ffffcc', border: '2px solid #ffff00' }}>
-        <h4 style={{ margin: '0 0 8px 0', fontSize: '11px' }}>⚠️ IMPORTANTE:</h4>
-        <p style={{ fontSize: '10px', margin: 0 }}>
+      <WarningBox>
+        <h4>⚠️ IMPORTANTE:</h4>
+        <p>
           Los beneficios on-chain solo están disponibles para donantes directos en Web3. Las
           plataformas tradicionales tienen comisiones que reducen el impacto de tu apoyo.
         </p>
-      </div>
+      </WarningBox>
 
       <div style={{ marginTop: '16px', padding: '12px', background: '#e0e0e0', border: '2px solid #808080' }}>
         <h4 style={{ margin: '0 0 8px 0', fontSize: '11px' }}>PROGRESO GLOBAL:</h4>

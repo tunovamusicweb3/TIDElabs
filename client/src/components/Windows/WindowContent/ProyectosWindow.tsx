@@ -17,6 +17,7 @@ const TabContainer = styled.div`
   gap: 4px;
   margin-bottom: 12px;
   border-bottom: 2px solid #808080;
+  flex-wrap: wrap;
 `;
 
 const Tab = styled.button<{ $isActive?: boolean }>`
@@ -34,9 +35,15 @@ const Tab = styled.button<{ $isActive?: boolean }>`
   font-family: 'MS Sans Serif', Arial, sans-serif;
   font-size: 11px;
   font-weight: bold;
+  transition: all 0.1s ease;
 
   &:hover {
     background: linear-gradient(180deg, #c0c0c0 0%, #dfdfdf 50%, #808080 100%);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
@@ -45,7 +52,14 @@ const ProjectBox = styled.div`
   border-color: #dfdfdf #808080 #808080 #dfdfdf;
   padding: 12px;
   margin-bottom: 12px;
-  background: #c0c0c0;
+  background: linear-gradient(135deg, #c0c0c0 0%, #dfdfdf 100%);
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: inset 0 0 4px rgba(0, 0, 128, 0.2);
+    border-color: #0000ff #808080 #808080 #0000ff;
+  }
 `;
 
 const ProjectTitle = styled.h3`
@@ -53,6 +67,18 @@ const ProjectTitle = styled.h3`
   font-weight: bold;
   color: #000080;
   margin-bottom: 8px;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+`;
+
+const ProjectStatus = styled.div`
+  font-size: 10px;
+  color: #fff;
+  background: #0000ff;
+  padding: 2px 6px;
+  display: inline-block;
+  margin-bottom: 6px;
+  border-radius: 2px;
+  font-weight: bold;
 `;
 
 const ProjectText = styled.p`
@@ -120,7 +146,7 @@ export function ProyectosWindow() {
     <Content>
       <TabContainer>
         <Tab $isActive={activeTab === 'all'} onClick={() => setActiveTab('all')}>
-          Todos
+          📋 Todos
         </Tab>
         {projects.map((p) => (
           <Tab key={p.id} $isActive={activeTab === p.id} onClick={() => setActiveTab(p.id)}>
@@ -131,12 +157,8 @@ export function ProyectosWindow() {
 
       {filteredProjects.map((project) => (
         <ProjectBox key={project.id}>
-          <ProjectTitle>
-            {project.emoji} {project.name}
-          </ProjectTitle>
-          <ProjectText>
-            <strong>Status:</strong> {project.status}
-          </ProjectText>
+          <ProjectTitle>{project.emoji} {project.name}</ProjectTitle>
+          <ProjectStatus>{project.status}</ProjectStatus>
           <ProjectText>{project.description}</ProjectText>
         </ProjectBox>
       ))}

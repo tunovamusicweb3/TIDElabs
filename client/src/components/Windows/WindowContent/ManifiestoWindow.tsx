@@ -17,16 +17,72 @@ const Title = styled.h2`
   font-weight: bold;
   margin-bottom: 12px;
   color: #000080;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+  border-bottom: 2px solid #000080;
+  padding-bottom: 8px;
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: #000080;
+  background: rgba(0, 0, 128, 0.1);
+  padding: 4px 8px;
+  border-left: 3px solid #000080;
 `;
 
 const Paragraph = styled.p`
   margin-bottom: 8px;
   text-align: justify;
+  line-height: 1.5;
 `;
 
 const Highlight = styled.span`
   background: #ffff00;
   font-weight: bold;
+  padding: 0 2px;
+  border-radius: 1px;
+`;
+
+const HighlightBlue = styled.span`
+  color: #0000ff;
+  font-weight: bold;
+`;
+
+const PillarList = styled.div`
+  background: linear-gradient(90deg, rgba(0, 0, 128, 0.05) 0%, transparent 100%);
+  border-left: 3px solid #0000ff;
+  padding: 8px 12px;
+  margin: 8px 0;
+`;
+
+const PillarItem = styled.div`
+  margin-bottom: 6px;
+  padding-left: 16px;
+  position: relative;
+  font-size: 10px;
+
+  &:before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #0000ff;
+    font-weight: bold;
+  }
+`;
+
+const Quote = styled.div`
+  margin-top: 16px;
+  padding: 12px;
+  background: #ffffcc;
+  border: 2px solid;
+  border-color: #dfdfdf #808080 #808080 #dfdfdf;
+  font-style: italic;
+  font-size: 10px;
+  text-align: center;
+  color: #000080;
 `;
 
 export function ManifiestoWindow() {
@@ -34,9 +90,7 @@ export function ManifiestoWindow() {
     <Content>
       <Title>🏴‍☠️ MANIFIESTO TIDELABS</Title>
 
-      <Paragraph>
-        <strong>MISIÓN SAGRADA:</strong>
-      </Paragraph>
+      <SectionTitle>MISIÓN SAGRADA</SectionTitle>
 
       <Paragraph>
         Construir la primera landing Web3 que sea una experiencia de escritorio Windows 95
@@ -56,9 +110,7 @@ export function ManifiestoWindow() {
         Aquí no aceptamos dinero fiat. Solo <Highlight>CRYPTO</Highlight>.
       </Paragraph>
 
-      <Paragraph>
-        <strong>OBJETIVO PRIMARIO:</strong>
-      </Paragraph>
+      <SectionTitle>OBJETIVO PRIMARIO</SectionTitle>
 
       <Paragraph>
         Captar donativos de verdaderos Nakamas Web3 sin monto mínimo ni máximo, ofreciendo
@@ -67,28 +119,21 @@ export function ManifiestoWindow() {
         camino Web3).
       </Paragraph>
 
-      <Paragraph>
-        <strong>PILARES INAMOVIBLES:</strong>
-      </Paragraph>
+      <SectionTitle>PILARES INAMOVIBLES</SectionTitle>
 
-      <Paragraph>
-        1. Estética Win95 auténtica (píxel-perfect)
-        <br />
-        2. Narrativa poético-renacentista en cada texto
-        <br />
-        3. Crypto-only como camino principal
-        <br />
-        4. Contacto directo: SOLO Telegram @Web3Sh4rK
-        <br />
-        5. Transparencia radical on-chain
-        <br />
-        6. Comunidad &gt; Capital
-      </Paragraph>
+      <PillarList>
+        <PillarItem>Estética Win95 auténtica (píxel-perfect)</PillarItem>
+        <PillarItem>Narrativa poético-renacentista en cada texto</PillarItem>
+        <PillarItem>Crypto-only como camino principal</PillarItem>
+        <PillarItem>Contacto directo: SOLO Telegram @Web3Sh4rK</PillarItem>
+        <PillarItem>Transparencia radical on-chain</PillarItem>
+        <PillarItem>Comunidad &gt; Capital</PillarItem>
+      </PillarList>
 
-      <Paragraph style={{ marginTop: '16px', fontSize: '10px', fontStyle: 'italic' }}>
+      <Quote>
         "En la intersección del pasado nostálgico y el futuro descentralizado, construimos un
         legado eterno."
-      </Paragraph>
+      </Quote>
     </Content>
   );
 }
